@@ -1,0 +1,36 @@
+.jumbotron h1 {
+	text-align: center;
+}
+
+#grid {
+	margin: auto;
+}
+
+.cell {
+	text-align: center;
+	display: inline-flex;
+	border: 1px solid black;
+	width: 45px;
+	height: 45px;
+	float: left;
+}
+
+.cell select{
+	margin: auto;
+	width:100%;
+	height:100%;
+}
+
+.cell img {
+	margin:auto;
+}
+
+#content {
+	margin: auto;
+	padding: 10px;
+	width: 80%;
+}
+
+form {
+	display:flex;
+}
