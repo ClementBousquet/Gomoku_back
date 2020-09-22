@@ -1,5 +1,5 @@
 <?php
-class Game {
+abstract class Game {
 
 	var $over;
 	var $won;
@@ -14,17 +14,15 @@ class Game {
 	}
 
 	function isOver() {
-		if ($this->won)
+		if ($this->won){
 			return true;
-
-		if ($this->over)
+		}
+		if ($this->over){
 			return true;
-
-		if ($this->health < 0)
-			return true;
-
+		}
 		return false;
 	}
+
 }
 
 function errorAlert($msg) {

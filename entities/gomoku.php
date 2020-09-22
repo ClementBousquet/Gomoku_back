@@ -1,13 +1,14 @@
 <?php
 class Gomoku extends game {
-	var $board = array();
+
+	const GRID_SIZE = 19;
+	var $board = array(); //Tableau de cellules à implémenter
 	var $totalMoves = 0;
 	var $player1;
 	var $player2;
 	var $playing;
 
-	function __construct()
-	{
+	function __construct() {
 		game::start();
 		$this->player1 = new Player("joueur 1","noir");
 		$this->player2 = new Player("joueur 2", "blanc");
@@ -20,17 +21,20 @@ class Gomoku extends game {
 		$this->start();
 		$this->totalMoves = 0;
     $this->newBoard();
+		$this->switchPlayer();
+		$this->player1->count = 0;
+		$this->player2->count = 0;
 	}
 
-    function newBoard() {
-			$this->board = array();
-      //Initialise la grille
-      for ($x = 0; $x < 19; $x++) {
-        for ($y = 0; $y < 19; $y++) {
-            $this->board[$x][$y] = null;
-        }
+  function newBoard() {
+		$this->board = array();
+    //Initialise la grille
+    for ($x = 0; $x < self::GRID_SIZE; $x++) {
+      for ($y = 0; $y < self::GRID_SIZE; $y++) {
+          $this->board[$x][$y] = null;
       }
     }
+  }
 
 	function playGame($data) {
 		if (!$this->isOver() && isset($data['move'])) {
@@ -47,8 +51,8 @@ class Gomoku extends game {
 		//tant que le jeu est en cours
 		if (!$this->isOver()) {
 			echo "<div id=\"grid\" class=\"col-10\">";
-			for ($x = 0; $x < 19; $x++) {
-				for ($y = 0; $y < 19; $y++) {
+			for ($x = 0; $x < self::GRID_SIZE; $x++) {
+				for ($y = 0; $y < self::GRID_SIZE; $y++) {
 					echo "<div class=\"cell\">";
 					//Si la cellule n'est pas nulle
 					if ($this->board[$x][$y]) {
@@ -70,7 +74,7 @@ class Gomoku extends game {
 			echo "</div>";
 		} else {
 			echo "<div class=\"endgame\">";
-			if ($this->isOver() != "draw") {
+			if (`²` != "draw") {
 				echo successAlert("Joueur " . $this->playing->name."(".$this->playing->color."), a gagné !");
 			} else if ($this->isOver() == "draw") {
 				echo errorAlert("Egalité. Réessayer ?");
@@ -95,25 +99,32 @@ class Gomoku extends game {
 				if ($this->playing == $this->player1) {
 					$this->player1->status = "waiting";
 					$this->player2->status = "playing";
-					$this->playing = $this->player2;
 				}
 				else {
 					$this->player1->status = "playing";
 					$this->player2->status = "waiting";
-					$this->playing = $this->player1;
 				}
-
 				$this->totalMoves++;
 			}
 		}
-		if ($this->isOver())
+		if ($this->isOver()){
 			return;
+		}
+		$this->switchPlayer();
+	}
+
+	function switchPlayer() {
+		if ($this->player1->status == "playing") {
+			$this->playing = $this->player1;
+		} else if ($this->player2->status == "playing") {
+			$this->playing = $this->player2;
+		}
 	}
 
 	function isOver() {
 		//Lignes
 		foreach ($this->board as $key) {
-			for($i = 0; $i < 19 - 4; $i++) {
+			for($i = 0; $i < self::GRID_SIZE - 4; $i++) {
 				if ($key[$i] == $key[$i+1] && $key[$i+1] == $key[$i+2] && $key[$i+2] == $key[$i+3] && $key[$i+3] == $key[$i+4]
 				 && isset($key[$i]) && isset($key[$i+1]) && isset($key[$i+2]) && isset($key[$i+3]) && isset($key[$i+4])) {
 					return $key[$i];
@@ -121,9 +132,9 @@ class Gomoku extends game {
 			}
 		}
 		//Colonnes
-		for($i = 0; $i < 19 - 4; $i++) {
+		for($i = 0; $i < self::GRID_SIZE - 4; $i++) {
 			$values = array_column($this->board,$i);
-			for($j = 0; $j < 19 - 4; $j++) {
+			for($j = 0; $j < self::GRID_SIZE - 4; $j++) {
 				if ($values[$j] == $values[$j+1] && $values[$j+1] == $values[$j+2] && $values[$j+2] == $values[$j+3] && $values[$j+3] == $values[$j+4]
 				 && isset($values[$j]) && isset($values[$j+1]) && isset($values[$j+2]) && isset($values[$j+3]) && isset($values[$j+4])) {
 					return $values[$j];
@@ -131,8 +142,8 @@ class Gomoku extends game {
 			}
 		}
 		//Diagonale left-right
-		for($i = 0; $i < 19 - 4; $i++) {
-			for($j = 0; $j < 19 - 4; $j++) {
+		for($i = 0; $i < self::GRID_SIZE - 4; $i++) {
+			for($j = 0; $j < self::GRID_SIZE - 4; $j++) {
 						$cell1 = $this->board[$i][$j];
 						$cell2 =  $this->board[$i+1][$j+1];
 						$cell3 =  $this->board[$i+2][$j+2];
@@ -145,8 +156,8 @@ class Gomoku extends game {
 			}
 		}
 		//Diagonale right-left
-		for($i = 0; $i < 19 - 4; $i++) {
-			for($j = 4; $j < 19; $j++) {
+		for($i = 0; $i < self::GRID_SIZE - 4; $i++) {
+			for($j = 4; $j < self::GRID_SIZE; $j++) {
 				$cell1 = $this->board[$i][$j];
 				$cell2 =  $this->board[$i+1][$j-1];
 				$cell3 =  $this->board[$i+2][$j-2];
@@ -165,7 +176,7 @@ class Gomoku extends game {
 
 	function isEnabled($x, $y) {
 		//Case centrale
-		if ($x == 9 && $y == 9) {
+		if ($x == intdiv(self::GRID_SIZE,2) && $y == intdiv(self::GRID_SIZE,2)) {
 			return "enabled";
 		}
 		//Angles
@@ -174,42 +185,42 @@ class Gomoku extends game {
 				return "enabled";
 			}
 		}
-		if ($x == 0 && $y == 18) { //Angle sup droit
+		if ($x == 0 && $y == self::GRID_SIZE-1) { //Angle sup droit
 			if ($this->board[$x+1][$y] || $this->board[$x][$y-1] || $this->board[$x+1][$y-1]) {
 				return "enabled";
 			}
 		}
-		if ($x == 18 && $y == 0) { //Angle inf gauche
+		if ($x == self::GRID_SIZE-1 && $y == 0) { //Angle inf gauche
 			if ($this->board[$x][$y+1] || $this->board[$x-1][$y+1] || $this->board[$x-1][$y]) {
 				return "enabled";
 			}
 		}
-		if ($x == 18 && $y == 18) { //Angle inf droit
+		if ($x == self::GRID_SIZE-1 && $y == self::GRID_SIZE-1) { //Angle inf droit
 			if ($this->board[$x][$y-1] || $this->board[$x-1][$y-1] || $this->board[$x-1][$y]) {
 				return "enabled";
 			}
 		}
-		if ($x == 0 && $y != 0 && $y != 18) { //Bord sup
+		if ($x == 0 && $y != 0 && $y != self::GRID_SIZE-1) { //Bord sup
 			if ($this->board[$x][$y+1] || $this->board[$x+1][$y+1] || $this->board[$x+1][$y] || $this->board[$x+1][$y-1] || $this->board[$x][$y-1]) {
 				return "enabled";
 			}
 		}
-		if ($x == 18 && $y != 18 && $y != 0) { //Bord inf
+		if ($x == self::GRID_SIZE-1 && $y != self::GRID_SIZE-1 && $y != 0) { //Bord inf
 			if ($this->board[$x][$y+1] || $this->board[$x][$y-1] || $this->board[$x-1][$y-1] || $this->board[$x-1][$y] || $this->board[$x-1][$y+1]) {
 				return "enabled";
 			}
 		}
-		if ($y == 0 && $x != 0 && $x != 18) { //Bord gauche
+		if ($y == 0 && $x != 0 && $x != self::GRID_SIZE-1) { //Bord gauche
 			if ($this->board[$x][$y+1] || $this->board[$x+1][$y+1] || $this->board[$x+1][$y] || $this->board[$x-1][$y] || $this->board[$x-1][$y+1]) {
 				return "enabled";
 			}
 		}
-		if ($y == 18 && $x != 0 && $x != 18) { //Bord droit
+		if ($y == self::GRID_SIZE-1 && $x != 0 && $x != self::GRID_SIZE-1) { //Bord droit
 			if ($this->board[$x+1][$y] || $this->board[$x+1][$y-1] || $this->board[$x][$y-1] || $this->board[$x-1][$y-1] || $this->board[$x-1][$y]) {
 				return "enabled";
 			}
 		}
-		if ($x != 0 && $x != 18 && $y != 0 && $y != 18) {
+		if ($x != 0 && $x != self::GRID_SIZE-1 && $y != 0 && $y != self::GRID_SIZE-1) {
 			//Si case sans bordure
 			if ($this->board[$x][$y+1] || $this->board[$x+1][$y+1] || $this->board[$x+1][$y] || $this->board[$x+1][$y-1] || $this->board[$x][$y-1] ||
 			$this->board[$x-1][$y-1] || $this->board[$x-1][$y] || $this->board[$x-1][$y+1]) {
@@ -218,4 +229,5 @@ class Gomoku extends game {
 		}
 		return "disabled";
 	}
+
 }

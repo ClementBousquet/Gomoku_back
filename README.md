@@ -1,2 +1,2 @@
 # Gomoku_back
-Gomoku game back
+Gomoku game back end

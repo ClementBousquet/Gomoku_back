@@ -6,9 +6,7 @@ class Player {
   var $color;
   var $name;
 
-
-  function __construct($name, $color)
-	{
+  function __construct($name, $color) {
     $this->status = "waiting";
     $this->count = 0;
     $this->name = $name;
